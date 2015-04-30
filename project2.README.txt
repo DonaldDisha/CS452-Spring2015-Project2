@@ -1,3 +1,14 @@
-name, date, description
+Donald Disha
+4/30/2015
 
-be sure to include complete details of how to interact with your application
+My project is an application that uses subdivisions to create a sphere. 
+There are a variety of buttons used in this:
+
+Increase Subdivisions
+Decrease Subdivisions
+Rotate X,Y,Z axis
+Toggle Rotation
+Increase Radius
+Decrease Radius
+
+Texture was applied using reflection map
