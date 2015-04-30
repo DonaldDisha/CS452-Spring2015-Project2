@@ -1,25 +1,100 @@
+<!--
+Donald Disha
+Project 2
+-->
+
 <!DOCTYPE html>
 <html>
-<head>
+
 <script id="vertex-shader" type="x-shader/x-vertex">
+
 attribute vec4 vPosition;
+attribute vec3 vNormal;
+varying vec4 fColor;
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+attribute vec2 vTexCoord;
+varying vec2 fTexCoord;
+
+varying vec3 N, L, E, H, R;
+
+uniform vec4 lightPosition;
+
+uniform mat3 normalMatrix;
+uniform float shininess;
+
 void main()
 {
-gl_Position = vPosition;
+    vec3 light = lightPosition.xyz;
+    vec3 pos = -(modelViewMatrix * vPosition).xyz;
+    
+	L = normalize(light - pos);
+
+    E =  -normalize(pos);
+	H = normalize( L + E );
+    N = normalize( normalMatrix*vNormal.xyz);
+	
+    vec4 ambient = ambientProduct;
+	float Kd = max( dot(L, N), 0.0 );
+    vec4  diffuse = Kd*diffuseProduct;
+    float Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular = Ks * specularProduct;
+	
+	if( dot(L, N) < 0.0 ){
+		specular = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+		
+	gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+	
+	fColor = ambient + diffuse +specular;
+	fColor.a = 1.0;
+	
+	R = reflect(pos, N);
+	
+	
+    
 }
 </script>
+
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
+
+varying vec4 fColor;
+varying vec3 R;
+uniform samplerCube texMap;
+
 void main()
-{
-gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+{    
+	vec4 texColor = textureCube(texMap, R);
+	
+    gl_FragColor = fColor*texColor;
 }
 </script>
+
+<p> </p>
+<button id = "Button0">Increase Radius</button>
+<button id = "Button1">Decrease Radius</button>
+
+<p> </p>
+<button id = "Button2">Rotate X</button>
+<button id = "Button3">Rotate Y</button>
+<button id = "Button4">Rotate Z</button>
+<button id = "Button5">Toggle Rotation</button>
+
+<p> </p>
+<button id = "Button6">Increase Subdivisions</button>
+<button id = "Button7">Decrease Subdivisions</button>
+
+
+<p></p>
+
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="project1.js"></script>
-</head>
+<script type="text/javascript" src="project2.js"></script>
+
 <body>
 <canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
